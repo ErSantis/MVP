@@ -1,0 +1,5 @@
+body {
+    background-image: url('../static/images/facha.jpg');
+    background-size: cover;
+    backdrop-filter: blur(5px);
+}
