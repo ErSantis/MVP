@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, session, redirect, url_for
 import config
 import	mysql.connector
+import jsonify
 
 app = Flask(__name__)
 app.secret_key = "super secret key"
@@ -20,7 +21,7 @@ except Exception as e:
 #Pagina principal - Login
 @app.route('/',methods=['GET'])
 def home():
-    return render_template('index2.html')
+    return render_template('index.html')
 
 
 @app.route('/login', methods=['POST'])
@@ -48,24 +49,37 @@ def login():
 def subjects():
     StudentID = session['idStudent']
     cur = mydb.cursor()
-    cur.execute("SELECT s.* FROM Subject s join SubjectsByStudent sbs on s.idSubject = sbs.SubjectID WHERE StudentID = %s", [StudentID])
+    cur.execute("SELECT S.idSubject, S.Name, S.idDept, X.NRC  FROM Subject as S join (SELECT C.idSubject as ID, C.NRC as NRC FROM Courses as C JOIN CoursesRegister as CR ON C.NRC = CR.NRC JOIN Students as E ON E.idStudent = CR.idStudent WHERE E.idStudent = %s) as X ON X.ID = S.idSubject", [StudentID])
     sub = cur.fetchall()
-    print(cur.description)
-
-
     insertObject = []
     columnNames = [column[0] for column in cur.description]
     for record in sub:
         insertObject.append(dict(zip(columnNames, record)))
     cur.close()
     print(insertObject)
-
-    return render_template('subjects.html', tasks = insertObject)
+    return render_template('subjects.html', subjects = insertObject)
 
 @app.route('/logout')
 def logout():
     session.clear()
     return redirect(url_for('home'))
+
+
+@app.route('/subjects/<string:card_name>/<int:NRC>', methods=['GET', 'POST'])
+def subject(card_name,NRC):
+    StudentID = session['idStudent']
+    print(StudentID)
+    print(NRC)
+    cur = mydb.cursor()
+    cur.execute("SELECT * FROM Tasks WHERE idStudent  = %s and NRC = %s", (StudentID,NRC))
+    tasks = cur.fetchall()
+
+    insertObject = []
+    columnNames = [column[0] for column in cur.description]
+    for record in tasks:
+        insertObject.append(dict(zip(columnNames, record)))
+    cur.close()
+    return render_template('course.html', tasks = insertObject)
 
 if __name__ == '__main__':
         app.run(debug=True)
