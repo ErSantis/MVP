@@ -13,7 +13,6 @@
         integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN"
         crossorigin="anonymous"></script>
 
-    <script src="{{ url_for('static', filename='js/jquery.js') }}"></script>
     <script src="{{ url_for('static', filename='js/subjects.js') }}"></script>
 
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/subjects.css')}}" />
@@ -38,17 +37,18 @@
 
         <!-- Tasks -->
         <div class="row row-col-1 row-cols-sm-1 row-cols-md-3 row-cols-lg-4 mt-3">
-            {% for task in tasks %}
+            {% for subject in subjects %}
             <div class="col-md-3">
-                <div class="card">
+                <div class="card", id = "miDiv_{{ subject.Name }}">
                     <div class="card__image-holder">
-                        <img class="card__image" src="https://source.unsplash.com/300x225/?{{ task.Name }}"
-                            alt="{{ task.Name }}" />
+                        <img class="card__image" src="https://source.unsplash.com/300x225/?{{ subject.Name }}"
+                            alt="{{ subject.Name }}" />
                     </div>
                     <div class="card-title">
                         <h2>
-                            {{ task.Name }}
-                            <small>{{ task.idDept }}</small>
+                            {{ subject.Name }}
+                            <small>{{ subject.idDept }}</small>
+                            <small class="nrc" id="{{ subject.NRC }}">{{ subject.NRC }}</small>
                         </h2>
                     </div>
                 </div>
@@ -80,40 +80,6 @@
         </div>
     </div>
 
-    <!-- User Modal -->
-    <div class="modal fade" id="user-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="exampleModalLabel">
-                        Nuevo usuario
-                    </h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form action="/new-user" method="post">
-                        <div class="row">
-                            <div class="col-6">
-                                <label>Nombre</label>
-                                <input type="text" class="form-control mb-3" name="name" />
-                            </div>
-                            <div class="col-6">
-                                <label>Apellidos</label>
-                                <input type="text" class="form-control mb-3" name="surnames" />
-                            </div>
-                        </div>
-                        <label>Email</label>
-                        <input type="email" class="form-control mb-3" name="email" />
-                        <label>Contraseña</label>
-                        <input type="password" class="form-control mb-3" name="password" />
-                        <button type="submit" class="btn btn-primary w-100">
-                            Guardar
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
 </body>
 
 </html>
