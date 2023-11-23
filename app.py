@@ -68,18 +68,30 @@ def logout():
 @app.route('/subjects/<string:card_name>/<int:NRC>', methods=['GET', 'POST'])
 def subject(card_name,NRC):
     StudentID = session['idStudent']
-    print(StudentID)
-    print(NRC)
+    cur = mydb.cursor()
+    
+    #Profesor, departamento 
+    cur.execute("SELECT DISTINCT P.Name, P.MiddleName, P.LastName, P.Email, D.NameDept FROM CoursesProf AS CP JOIN Professors AS P ON P.idProfessor = CP.idProfessor JOIN Departments AS D ON D.idDept = P.idDept JOIN CoursesRegister AS CR ON CR.NRC = CP.NRC WHERE CR.NRC = %s;",[NRC])
+    info = cur.fetchall()
+    
+    info = {
+    'Name' : card_name,
+    'ProfName': [info[i][0] + (' ' + str(info[i][1]) if info[i][1] is not None else '') + ' ' + info[i][2] for i in range(len(info))],
+    'ProfEmail': [info[i][3] for i in range(len(info))],
+    'NameDept': info[0][4]
+    }
+    cur.close()
+
+    #Encontar tareas
     cur = mydb.cursor()
     cur.execute("SELECT * FROM Tasks WHERE idStudent  = %s and NRC = %s", (StudentID,NRC))
     tasks = cur.fetchall()
-
     insertObject = []
     columnNames = [column[0] for column in cur.description]
     for record in tasks:
         insertObject.append(dict(zip(columnNames, record)))
     cur.close()
-    return render_template('course.html', tasks = insertObject)
+    return render_template('course2.html', tasks = insertObject, info = info)
 
 if __name__ == '__main__':
         app.run(debug=True)
