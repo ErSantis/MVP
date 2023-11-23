@@ -1,4 +1,4 @@
-body {
+.my-custom-body {
     font-family: "Century Gothic", 'Lato', sans-serif;
 }
 
@@ -135,6 +135,10 @@ a {
 .collapsibles-wrapper .collapsible-content__inner p {
     font-size: 16px;
     line-height: 24px;
+}
+.card.finished {
+    opacity: 0.7; /* Ajusta la opacidad según tus preferencias */
+    /* Otros estilos específicos para tareas finalizadas */
 }
 
 @media (min-width: 800px) {
