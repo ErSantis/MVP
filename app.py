@@ -1,7 +1,6 @@
 from flask import Flask, render_template, request, session, redirect, url_for
 import config
 import	mysql.connector
-import jsonify
 
 app = Flask(__name__)
 app.secret_key = "super secret key"
@@ -66,7 +65,9 @@ def logout():
 
 
 @app.route('/subjects/<string:card_name>/<int:NRC>', methods=['GET', 'POST'])
-def subject(card_name,NRC):
+def course(card_name,NRC):
+    session['card_name'] = card_name
+    session['NRC'] = NRC
     StudentID = session['idStudent']
     cur = mydb.cursor()
     
@@ -91,7 +92,38 @@ def subject(card_name,NRC):
     for record in tasks:
         insertObject.append(dict(zip(columnNames, record)))
     cur.close()
-    return render_template('course2.html', tasks = insertObject, info = info)
+    print(insertObject)
+    return render_template('course.html', tasks = insertObject, info = info)
+
+@app.route('/new-task', methods=['POST'])
+def newTask():
+    title = request.form['title']
+    description = request.form['description']
+    dateTask = request.form['date']
+    idStudent = session.get('idStudent')
+    NRC = session.get('NRC')
+
+    if title and description and dateTask:
+        cur = mydb.cursor()
+        sql = "INSERT INTO Tasks (idTask, Title, Description, EndDate, Status, NRC, idStudent) VALUES (NULL, %s, %s, %s, 0, %s, %s)"
+        data = (title, description, dateTask, NRC, idStudent)
+        cur.execute(sql, data)
+        mydb.commit()
+        cur.close()
+    return redirect(url_for('course', card_name = session.get('card_name'), NRC = session.get('NRC'), _anchor='tab-tasks'))
+
+
+@app.route("/delete-task", methods=["POST"])
+def deleteTask():
+    print('-Borrar')
+    cur = mydb.cursor()
+    id = request.form['idTask']
+    print(id)
+    cur.execute("UPDATE Tasks SET Status = 1 WHERE idTask = %s",[id])
+    mydb.commit()
+    
+    cur.close()
+    return redirect(url_for('course', card_name = session.get('card_name'), NRC = session.get('NRC'), _anchor='tab-tasks'))
 
 if __name__ == '__main__':
         app.run(debug=True)
