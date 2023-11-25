@@ -16,6 +16,9 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN"
         crossorigin="anonymous"></script>
+    
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.1/dist/leaflet.css" />
+
 </head>
 
 <body class="my-custom-body">
@@ -27,7 +30,7 @@
             <a class="et-hero-tab" href="#tab-schedule">Horarios</a>
             <a class="et-hero-tab" href="#tab-tasks">Tareas</a>
             <a class="et-hero-tab" href="#tab-map">Mapa</a>
-            <a class="et-hero-tab" href="#tab-other">Other</a>
+            <a href="/subjects" id="logout">Regresar</a>
             <span class="et-hero-tab-slider"></span>
         </div>
     </section>
@@ -48,7 +51,11 @@
 
         <section class="et-slide" id="tab-schedule">
             <h1>Horarios</h1>
-            <h3>Aqui van los Horarios</h3>
+            <br />
+            {% for schedule in schedules %}
+            <h3><b>{{schedule.Day}}:</b> </br> {{schedule.StartTime}} - {{schedule.EndTime}} </br>{{schedule.Name}} </h3>
+            <br />
+            {% endfor %}
         </section>
 
         <section class="et-slide" id="tab-tasks">
@@ -148,11 +155,26 @@
 
         <section class="et-slide" id="tab-map">
             <h1>Mapa</h1>
-        </section>
-
-        <section class="et-slide" id="tab-other">
-            <h1>Other</h1>
-            <h3>something about other</h3>
+            <br />
+            <form id="markerForm">
+                <label for="markerPosition" class="labelfor">Selecciona la posición del marcador:</label>
+                <select id="markerPosition" class="custom-select" name="markerPosition">
+                    {% for location in locations %}
+                    <option value="{{location.Latitude}}, {{location.Longitude}}">{{location.Name}}</option>
+                    {% endfor %}
+                </select>
+                <button type="button" class="btn btn-outline-primary" onclick="funcionInit();">Actualizar
+                    Marcador</button>
+            </form>
+            <br />
+            <div id="map"></div>
+            <script src="https://unpkg.com/leaflet@1.3.1/dist/leaflet.js"></script>
+            <script src="{{ url_for('static', filename='dist/leaflet-routing-machine.js') }}"></script>
+            <script src="{{ url_for('static', filename='dist/lrm-graphhopper-1.2.0.min.js') }}"></script>
+            <script src="{{ url_for('static', filename='dist/Control.Geocoder.js') }}"></script>
+            <script src="{{ url_for('static', filename='dist/config.js') }}"></script>
+            <script src="{{ url_for('static', filename='js/map.js') }}"></script>
+            <script src="{{ url_for('static', filename='js/location.js') }}"></script>
         </section>
     </main>
 </body>
