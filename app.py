@@ -61,7 +61,7 @@ def subjects():
 @app.route('/logout')
 def logout():
     session.clear()
-    return redirect(url_for('home'))
+    return redirect(url_for('home'))    
 
 
 @app.route('/subjects/<string:card_name>/<int:NRC>', methods=['GET', 'POST'])
@@ -92,8 +92,30 @@ def course(card_name,NRC):
     for record in tasks:
         insertObject.append(dict(zip(columnNames, record)))
     cur.close()
-    print(insertObject)
-    return render_template('course.html', tasks = insertObject, info = info)
+
+    #Econtrar ubicaciones
+    cur = mydb.cursor()
+    cur.execute("SELECT DISTINCT L.Name, L.Latitude, L.Longitude FROM Location L JOIN Schedules S ON L.idLocation = S.idLocation WHERE S.NRC = %s", [NRC])
+    location = cur.fetchall()
+    locations = []
+    columnNames = [column[0] for column in cur.description]
+    for record in location:
+        locations.append(dict(zip(columnNames, record)))
+    cur.close()
+
+    #Encontrar Horarios
+    cur = mydb.cursor()
+    cur.execute("SELECT S.*, L.Name FROM Schedules S JOIN Location L ON S.idLocation = L.idLocation WHERE S.NRC = %s", [NRC])
+    schedule = cur.fetchall()
+    schedules = []
+    columnNames = [column[0] for column in cur.description]
+    for record in schedule:
+        schedules.append(dict(zip(columnNames, record)))
+    cur.close()
+
+
+
+    return render_template('course.html', tasks = insertObject, info = info, locations = locations, schedules = schedules)
 
 @app.route('/new-task', methods=['POST'])
 def newTask():
