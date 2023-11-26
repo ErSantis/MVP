@@ -100,6 +100,7 @@ try:
         'ProfEmail': [info[i][3] for i in range(len(info))],
         'NameDept': info[0][4]
         }
+        print(card_name)
         cur.close()
 
         #Encontar tareas
