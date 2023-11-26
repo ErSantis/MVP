@@ -1,20 +1,27 @@
 from flask import Flask, render_template, request, session, redirect, url_for
 import config
-import	mysql.connector
+import mysql.connector
 
 app = Flask(__name__)
 app.secret_key = "super secret key"
 
-try:
-    mydb = mysql.connector.connect(
-    host=config.MYSQL_ADDON_HOST,
-    user=config.MYSQL_ADDON_USER,
-    password=config.MYSQL_ADDON_PASSWORD,
-    database=config.MYSQL_ADDON_DB
-    )
-    print('Succesfull')
-except Exception as e:
-    print(e)
+def connect_db():
+    if hasattr(connect_db, 'mydb') and connect_db.mydb.is_connected():
+        print('La conexión ya existe')
+        return connect_db.mydb
+
+    try:
+        mydb = mysql.connector.connect(
+            host=config.MYSQL_ADDON_HOST,
+            user=config.MYSQL_ADDON_USER,
+            password=config.MYSQL_ADDON_PASSWORD,
+            database=config.MYSQL_ADDON_DB
+        )
+        print('Conexión exitosa')
+        connect_db.mydb = mydb  # Almacena la conexión para futuras llamadas
+        return mydb
+    except Exception as e:
+        print(e)
     
     
 #Pagina principal - Login
@@ -26,9 +33,9 @@ def home():
 try:
     @app.route('/login', methods=['POST'])
     def login():
+        mydb = connect_db()
         id_student = request.form['id_student']
         password = request.form['password']
-
         cur = mydb.cursor()
         cur.execute("SELECT * FROM Students WHERE idStudent = %s AND Password = %s", (id_student, password))
         user = cur.fetchone()
@@ -51,6 +58,7 @@ except Exception as e:
 try:
     @app.route('/subjects', methods=['GET'])
     def subjects():
+        mydb = connect_db()
         StudentID = session['idStudent']
         cur = mydb.cursor()
         cur.execute("SELECT S.idSubject, S.Name, S.idDept, X.NRC  FROM Subject as S join (SELECT C.idSubject as ID, C.NRC as NRC FROM Courses as C JOIN CoursesRegister as CR ON C.NRC = CR.NRC JOIN Students as E ON E.idStudent = CR.idStudent WHERE E.idStudent = %s) as X ON X.ID = S.idSubject", [StudentID])
@@ -60,7 +68,6 @@ try:
         for record in sub:
             insertObject.append(dict(zip(columnNames, record)))
         cur.close()
-        print(insertObject)
         return render_template('subjects.html', subjects = insertObject)
 except Exception as e:
     print(e)
@@ -77,6 +84,7 @@ except Exception as e:
 try:
     @app.route('/subjects/<string:card_name>/<int:NRC>', methods=['GET', 'POST'])
     def course(card_name,NRC):
+        mydb = connect_db()
         session['card_name'] = card_name
         session['NRC'] = NRC
         StudentID = session['idStudent']
@@ -132,6 +140,7 @@ except Exception as e:
 try:
     @app.route('/new-task', methods=['POST'])
     def newTask():
+        mydb = connect_db()
         title = request.form['title']
         description = request.form['description']
         dateTask = request.form['date']
@@ -153,10 +162,9 @@ except Exception as e:
 try:
     @app.route("/delete-task", methods=["POST"])
     def deleteTask():
-        print('-Borrar')
+        mydb = connect_db()
         cur = mydb.cursor()
         id = request.form['idTask']
-        print(id)
         cur.execute("UPDATE Tasks SET Status = 1 WHERE idTask = %s",[id])
         mydb.commit()
         
@@ -166,4 +174,4 @@ except Exception as e:
     print(e)
 
 if __name__ == '__main__':
-     app.run(debug=True)
+    app.run(debug=True)
