@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, session, redirect, url_for
 import config
 import mysql.connector
+from urllib.parse import unquote
 
 app = Flask(__name__)
 app.secret_key = "super secret key"
@@ -95,7 +96,7 @@ try:
         info = cur.fetchall()
         
         info = {
-        'Name' : card_name,
+        'Name' : unquote(card_name),
         'ProfName': [info[i][0] + (' ' + str(info[i][1]) if info[i][1] is not None else '') + ' ' + info[i][2] for i in range(len(info))],
         'ProfEmail': [info[i][3] for i in range(len(info))],
         'NameDept': info[0][4]
