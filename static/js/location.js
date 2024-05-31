@@ -1,5 +1,5 @@
 const funcionInit = () => {
-	if (!"geolocation" in navigator) {
+	if (!("geolocation" in navigator)) {
 		return alert(
 			"Tu navegador no soporta el acceso a la ubicación. Intenta con otro"
 		);
@@ -12,7 +12,7 @@ const funcionInit = () => {
 	};
 	const onErrorDeUbicacion = (err) => {
 		console.log("Error obteniendo ubicación: ", err);
-		alert("No se pudo obtener la ubicación");
+		//alert("No se pudo obtener la ubicación");
 	};
 
 	const opcionesDeSolicitud = {
@@ -23,9 +23,9 @@ const funcionInit = () => {
 
 	navigator.geolocation.getCurrentPosition(
 		onUbicacionConcedida,
-		//onErrorDeUbicacion,
+		onErrorDeUbicacion,
 		opcionesDeSolicitud
 	);
 };
 
-funcionInit();
+funcionInit(); // Solo necesitas llamar a la función una vez
