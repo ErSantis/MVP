@@ -62,7 +62,7 @@ try:
         mydb = connect_db()
         StudentID = session['idStudent']
         cur = mydb.cursor()
-        cur.execute("SELECT S.idSubject, S.Name, S.idDept, X.NRC  FROM Subject as S join (SELECT C.idSubject as ID, C.NRC as NRC FROM Courses as C JOIN CoursesRegister as CR ON C.NRC = CR.NRC JOIN Students as E ON E.idStudent = CR.idStudent WHERE E.idStudent = %s) as X ON X.ID = S.idSubject", [StudentID])
+        cur.execute("SELECT S.idSubject, S.Name, S.idDept, X.NRC  FROM Subject as S join (SELECT C.idSubject as ID, C.NRC as NRC FROM Courses as C JOIN CoursesRegister as CR ON C.NRC = CR.NRC JOIN Students as E ON E.idStudent = CR.idStudent WHERE E.idStudent = %s AND CR.Periodo = %s) as X ON X.ID = S.idSubject", [StudentID,Periodo])
         sub = cur.fetchall()
         insertObject = []
         columnNames = [column[0] for column in cur.description]
