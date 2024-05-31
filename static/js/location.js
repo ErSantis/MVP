@@ -23,7 +23,7 @@ const funcionInit = () => {
 
 	navigator.geolocation.getCurrentPosition(
 		onUbicacionConcedida,
-		onErrorDeUbicacion,
+		//onErrorDeUbicacion,
 		opcionesDeSolicitud
 	);
 };
