@@ -30,6 +30,7 @@ def connect_db():
 def home():
     return render_template('index.html')
 
+Periodo = "2024-10"
 
 try:
     @app.route('/login', methods=['POST'])
@@ -96,6 +97,7 @@ try:
         info = cur.fetchall()
         
         info = {
+        'NRC' : NRC,
         'Name' : unquote(card_name),
         'ProfName': [info[i][0] + (' ' + str(info[i][1]) if info[i][1] is not None else '') + ' ' + info[i][2] for i in range(len(info))],
         'ProfEmail': [info[i][3] for i in range(len(info))],
